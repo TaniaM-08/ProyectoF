@@ -1,0 +1,303 @@
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../src/generated/prisma"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+enum UserRole {
+  CLIENT   @map("client")
+  ADMIN    @map("admin")
+  EMPLOYEE @map("employee")
+
+  @@map("user_role")
+}
+
+enum OrderStatus {
+  PENDING    @map("pending")
+  PROCESSING @map("processing")
+  SHIPPED    @map("shipped")
+  DELIVERED  @map("delivered")
+  CANCELLED  @map("cancelled")
+
+  @@map("order_status")
+}
+
+enum QuoteStatus {
+  DRAFT    @map("draft")
+  SENT     @map("sent")
+  APPROVED @map("approved")
+  REJECTED @map("rejected")
+  EXPIRED  @map("expired")
+
+  @@map("quote_status")
+}
+
+enum AppointmentStatus {
+  SCHEDULED    @map("scheduled")
+  CONFIRMED    @map("confirmed")
+  IN_PROGRESS  @map("in_progress")
+  COMPLETED    @map("completed")
+  CANCELLED    @map("cancelled")
+  RESCHEDULED  @map("rescheduled")
+
+  @@map("appointment_status")
+}
+
+enum AppointmentType {
+  CONSULTATION @map("consultation")
+  INSTALLATION @map("installation")
+  MAINTENANCE  @map("maintenance")
+  REPAIR       @map("repair")
+  DELIVERY     @map("delivery")
+
+  @@map("appointment_type")
+}
+
+// Models
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(100)
+  email     String   @unique @db.VarChar(100)
+  password  String
+  phone     String?
+  address   String?
+  role      UserRole @default(CLIENT)
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  // Relations
+  orders                    Order[]
+  quotes                    Quote[]
+  createdQuotes             Quote[]                   @relation("QuoteCreatedBy")
+  approvedQuotes            Quote[]                   @relation("QuoteApprovedBy")
+  cartItems                 CartItem[]
+  appointments              Appointment[]
+  assignedAppointments      Appointment[]             @relation("AppointmentAssignedTo")
+  createdAppointments       Appointment[]             @relation("AppointmentCreatedBy")
+  appointmentStatusChanges  AppointmentStatusHistory[]
+
+  @@map("users")
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(100)
+  slug        String   @unique @db.VarChar(150)
+  description String?
+  imageUrl    String?  @map("image_url")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  // Relations
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  price       Decimal  @db.Decimal(10, 2)
+  imageUrl    String?  @map("image_url")
+  stock       Int      @default(0)
+  featured    Boolean  @default(false)
+  rating      Decimal? @db.Decimal(2, 1)
+  categoryId  Int?     @map("category_id")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  // Relations
+  category   Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  orderItems OrderItem[]
+  cartItems  CartItem[]
+
+  @@map("products")
+}
+
+model Quote {
+  id             Int         @id @default(autoincrement())
+  quoteNumber    String      @unique @map("quote_number") @db.VarChar(250)
+  clientName     String      @map("client_name") @db.VarChar(250)
+  clientEmail    String      @map("client_email") @db.VarChar(250)
+  clientPhone    String?     @map("client_phone")
+  clientAddress  String?     @map("client_address")
+  status         QuoteStatus @default(DRAFT)
+  subtotal       Decimal     @default(0) @db.Decimal(10, 2)
+  discountAmount Decimal     @default(0) @map("discount_amount") @db.Decimal(10, 2)
+  total          Decimal     @default(0) @db.Decimal(10, 2)
+  notesProblem   String      @default("Problema") @map("notes_problem")
+  sizeRoom       String?     @map("size_room") @db.VarChar(250)
+  validUntil     DateTime?   @map("valid_until") @db.Date
+  userId         Int?        @map("user_id")
+  createdBy      Int?        @map("created_by")
+  approvedBy     Int?        @map("approved_by")
+  createdAt      DateTime    @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime    @updatedAt @map("updated_at") @db.Timestamptz
+  approvedAt     DateTime?   @map("approved_at") @db.Timestamptz
+
+  // Relations
+  user         User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  creator      User?         @relation("QuoteCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  approver     User?         @relation("QuoteApprovedBy", fields: [approvedBy], references: [id], onDelete: SetNull)
+  orders       Order[]
+  appointments Appointment[]
+  invoices     Invoice[]
+
+  @@map("quotes")
+}
+
+model Order {
+  id              Int         @id @default(autoincrement())
+  userId          Int?        @map("user_id")
+  quoteId         Int?        @map("quote_id")
+  orderNumber     String      @unique @map("order_number") @db.VarChar(250)
+  status          OrderStatus @default(PENDING)
+  subtotal        Decimal     @default(0) @db.Decimal(10, 2)
+  taxAmount       Decimal     @default(0) @map("tax_amount") @db.Decimal(10, 2)
+  shippingAmount  Decimal     @default(0) @map("shipping_amount") @db.Decimal(10, 2)
+  discountAmount  Decimal     @default(0) @map("discount_amount") @db.Decimal(10, 2)
+  total           Decimal     @default(0) @db.Decimal(10, 2)
+  shippingAddress String?     @map("shipping_address")
+  billingAddress  String?     @map("billing_address")
+  notes           String?
+  createdAt       DateTime    @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime    @updatedAt @map("updated_at") @db.Timestamptz
+  shippedAt       DateTime?   @map("shipped_at") @db.Timestamptz
+  deliveredAt     DateTime?   @map("delivered_at") @db.Timestamptz
+
+  // Relations
+  user         User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  quote        Quote?        @relation(fields: [quoteId], references: [id], onDelete: SetNull)
+  orderItems   OrderItem[]
+  appointments Appointment[]
+  invoices     Invoice[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id          Int     @id @default(autoincrement())
+  orderId     Int     @map("order_id")
+  productId   Int?    @map("product_id")
+  productName String  @map("product_name")
+  quantity    Int
+  unitPrice   Decimal @map("unit_price") @db.Decimal(10, 2)
+  totalPrice  Decimal @map("total_price") @db.Decimal(10, 2)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  // Relations
+  order   Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+model Appointment {
+  id                Int               @id @default(autoincrement())
+  appointmentNumber String            @unique @map("appointment_number") @db.VarChar(250)
+  appointmentType   AppointmentType   @map("appointment_type")
+  status            AppointmentStatus @default(SCHEDULED)
+  title             String
+  description       String?
+  scheduledDate     DateTime          @map("scheduled_date") @db.Date
+  scheduledTime     DateTime          @map("scheduled_time") @db.Time
+  durationMinutes   Int               @default(60) @map("duration_minutes")
+  clientName        String            @map("client_name")
+  clientEmail       String            @map("client_email")
+  clientPhone       String?           @map("client_phone")
+  clientAddress     String?           @map("client_address")
+  notes             String?
+  internalNotes     String?           @map("internal_notes")
+  completionNotes   String?           @map("completion_notes")
+  userId            Int?              @map("user_id")
+  quoteId           Int?              @map("quote_id")
+  orderId           Int?              @map("order_id")
+  assignedTo        Int?              @map("assigned_to")
+  createdBy         Int?              @map("created_by")
+  createdAt         DateTime          @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt         DateTime          @updatedAt @map("updated_at") @db.Timestamptz
+  completedAt       DateTime?         @map("completed_at") @db.Timestamptz
+
+  // Relations
+  user           User?                      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  quote          Quote?                     @relation(fields: [quoteId], references: [id], onDelete: SetNull)
+  order          Order?                     @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  assignedUser   User?                      @relation("AppointmentAssignedTo", fields: [assignedTo], references: [id], onDelete: SetNull)
+  creator        User?                      @relation("AppointmentCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  statusHistory  AppointmentStatusHistory[]
+
+  @@map("appointments")
+}
+
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  productId Int?     @map("product_id")
+  quantity  Int
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  // Relations
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id])
+
+  @@unique([userId, productId])
+  @@map("cart_items")
+}
+
+model Invoice {
+  id            Int       @id @default(autoincrement())
+  orderId       Int?      @map("order_id")
+  quoteId       Int?      @map("quote_id")
+  invoiceNumber String    @unique @map("invoice_number") @db.VarChar(250)
+  amount        Decimal   @db.Decimal(10, 2)
+  taxAmount     Decimal   @default(0) @map("tax_amount") @db.Decimal(10, 2)
+  totalAmount   Decimal   @map("total_amount") @db.Decimal(10, 2)
+  dueDate       DateTime? @map("due_date") @db.Date
+  paidAt        DateTime? @map("paid_at") @db.Timestamptz
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  // Relations
+  order Order? @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  quote Quote? @relation(fields: [quoteId], references: [id], onDelete: SetNull)
+
+  @@map("invoices")
+}
+
+model AppointmentStatusHistory {
+  id            Int                @id @default(autoincrement())
+  oldStatus     AppointmentStatus? @map("old_status")
+  newStatus     AppointmentStatus  @map("new_status")
+  appointmentId Int                @map("appointment_id")
+  changedBy     Int?               @map("changed_by")
+  notes         String?
+  createdAt     DateTime           @default(now()) @map("created_at") @db.Timestamptz
+
+  // Relations
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  user        User?       @relation(fields: [changedBy], references: [id], onDelete: SetNull)
+
+  @@map("appointment_status_history")
+}
+
+model Expense {
+  id          Int      @id @default(autoincrement())
+  description String
+  amount      Decimal  @db.Decimal(10, 2)
+  category    String?
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("expenses")
+}

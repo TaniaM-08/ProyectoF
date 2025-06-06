@@ -1,9 +1,19 @@
-import Image from "next/image";
+import { userCrud } from '@/lib/crud/user';
+import Image from 'next/image';
 
-export default function Home() {
+export default async function Home() {
+  const users = await userCrud.getAll();
+
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
+        <ul className="mt-4 flex flex-col gap-1">
+          {users.map(user => (
+            <li key={user.id} className="flex justify-between">
+              <span>{user.name}</span>
+            </li>
+          ))}
+        </ul>
         <Image
           className="dark:invert"
           src="/next.svg"
@@ -14,7 +24,7 @@ export default function Home() {
         />
         <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
           <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
+            Get started by editing{' '}
             <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
               src/app/page.tsx
             </code>
