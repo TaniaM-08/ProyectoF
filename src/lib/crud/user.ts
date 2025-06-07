@@ -1,9 +1,9 @@
-import prisma  from '../prisma'
-import { UserCreateData, UserUpdateData, UserFilters } from '../types'
+import prisma from '../prisma';
+import { UserCreateData, UserUpdateData, UserFilters } from '../types';
 
 export const userCrud = {
   async create(data: UserCreateData) {
-    return await prisma.user.create({ data })
+    return await prisma.user.create({ data });
   },
 
   async getAll(where?: UserFilters) {
@@ -18,8 +18,8 @@ export const userCrud = {
         role: true,
         isActive: true,
         createdAt: true,
-      }
-    })
+      },
+    });
   },
 
   async getById(id: number) {
@@ -30,10 +30,10 @@ export const userCrud = {
         quotes: true,
         appointments: true,
         cartItems: {
-          include: { product: true }
-        }
-      }
-    })
+          include: { product: true },
+        },
+      },
+    });
   },
 
   async update(id: number, data: UserUpdateData) {
@@ -41,16 +41,16 @@ export const userCrud = {
       where: { id },
       data: {
         ...data,
-        updatedAt: new Date()
-      }
-    })
+        updatedAt: new Date(),
+      },
+    });
   },
 
   async delete(id: number) {
-    return await prisma.user.delete({ where: { id } })
+    return await prisma.user.delete({ where: { id } });
   },
 
   async getByEmail(email: string) {
-    return await prisma.user.findUnique({ where: { email } })
-  }
-}
+    return await prisma.user.findUnique({ where: { email } });
+  },
+};

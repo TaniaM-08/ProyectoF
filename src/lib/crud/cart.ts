@@ -1,4 +1,4 @@
-import prisma from '../prisma'
+import prisma from '../prisma';
 
 export const cartCrud = {
   async addItem(userId: number, productId: number, quantity: number) {
@@ -6,20 +6,20 @@ export const cartCrud = {
       where: {
         userId_productId: {
           userId,
-          productId
-        }
+          productId,
+        },
       },
       update: {
         quantity: { increment: quantity },
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
       create: {
         userId,
         productId,
-        quantity
+        quantity,
       },
-      include: { product: true }
-    })
+      include: { product: true },
+    });
   },
 
   async getByUserId(userId: number) {
@@ -27,11 +27,11 @@ export const cartCrud = {
       where: { userId },
       include: {
         product: {
-          include: { category: true }
-        }
+          include: { category: true },
+        },
       },
-      orderBy: { createdAt: 'desc' }
-    })
+      orderBy: { createdAt: 'desc' },
+    });
   },
 
   async updateQuantity(userId: number, productId: number, quantity: number) {
@@ -39,14 +39,14 @@ export const cartCrud = {
       where: {
         userId_productId: {
           userId,
-          productId
-        }
+          productId,
+        },
       },
       data: {
         quantity,
-        updatedAt: new Date()
-      }
-    })
+        updatedAt: new Date(),
+      },
+    });
   },
 
   async removeItem(userId: number, productId: number) {
@@ -54,22 +54,22 @@ export const cartCrud = {
       where: {
         userId_productId: {
           userId,
-          productId
-        }
-      }
-    })
+          productId,
+        },
+      },
+    });
   },
 
   async clearCart(userId: number) {
     return await prisma.cartItem.deleteMany({
-      where: { userId }
-    })
+      where: { userId },
+    });
   },
 
   async getCartTotal(userId: number) {
-    const items = await this.getByUserId(userId)
+    const items = await this.getByUserId(userId);
     return items.reduce((total, item) => {
-      return total + (item.quantity * (item.product?.price.toNumber() || 0))
-    }, 0)
-  }
-}
+      return total + item.quantity * (item.product?.price.toNumber() || 0);
+    }, 0);
+  },
+};

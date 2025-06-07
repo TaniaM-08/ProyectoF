@@ -1,11 +1,56 @@
 
+export type UserRole = 'CLIENT' | 'ADMIN' | 'EMPLOYEE'
+export type OrderStatus = 'PENDING' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED'
+export type QuoteStatus = 'DRAFT' | 'SENT' | 'APPROVED' | 'REJECTED' | 'EXPIRED'
+export type AppointmentType = 'CONSULTATION' | 'INSTALLATION' | 'MAINTENANCE' | 'REPAIR' | 'DELIVERY'
+export type AppointmentStatus = 'SCHEDULED' | 'CONFIRMED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'RESCHEDULED'
+
+export enum User_Role {
+  CLIENT = 'client',
+  ADMIN = 'admin',
+  EMPLOYEE = 'employee'
+}
+
+export enum Order_Status {
+  PENDING = 'pending',
+  PROCESSING = 'processing',
+  SHIPPED = 'shipped',
+  DELIVERED = 'delivered',
+  CANCELLED = 'cancelled'
+}
+
+export enum Quote_Status {
+  DRAFT = 'draft',
+  SENT = 'sent',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
+  EXPIRED = 'expired'
+}
+
+export enum Appointment_Status {
+  SCHEDULED = 'scheduled',
+  CONFIRMED = 'confirmed',
+  IN_PROGRESS = 'in_progress',
+  COMPLETED = 'completed',
+  CANCELLED = 'cancelled',
+  RESCHEDULED = 'rescheduled'
+}
+
+export enum Appointment_Type {
+  CONSULTATION = 'consultation',
+  INSTALLATION = 'installation',
+  MAINTENANCE = 'maintenance',
+  REPAIR = 'repair',
+  DELIVERY = 'delivery'
+}
+
 export interface UserCreateData {
   name: string
   email: string
   password: string
   phone?: string
   address?: string
-  role?: 'CLIENT' | 'ADMIN' | 'EMPLOYEE'
+  role?: UserRole
 }
 
 export interface UserUpdateData {
@@ -14,13 +59,13 @@ export interface UserUpdateData {
   password?: string
   phone?: string
   address?: string
-  role?: 'CLIENT' | 'ADMIN' | 'EMPLOYEE'
+  role?: UserRole
   isActive?: boolean
   updatedAt?: Date
 }
 
 export interface UserFilters {
-  role?: 'CLIENT' | 'ADMIN' | 'EMPLOYEE'
+  role?: UserRole
   isActive?: boolean
   name?: string
   email?: string
@@ -90,12 +135,11 @@ export interface OrderCreateData {
 
 export interface OrderFilters {
   userId?: number
-  status?: 'PENDING' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED'
+  status?: OrderStatus
   dateFrom?: Date
   dateTo?: Date
 }
 
-export type OrderStatus = 'PENDING' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED'
 
 export interface QuoteCreateData {
   quoteNumber: string
@@ -124,17 +168,16 @@ export interface QuoteUpdateData {
 }
 
 export interface QuoteFilters {
-  status?: 'DRAFT' | 'SENT' | 'APPROVED' | 'REJECTED' | 'EXPIRED'
+  status?: QuoteStatus
   userId?: number
   dateFrom?: Date
   dateTo?: Date
 }
 
-export type QuoteStatus = 'DRAFT' | 'SENT' | 'APPROVED' | 'REJECTED' | 'EXPIRED'
 
 export interface AppointmentCreateData {
   appointmentNumber: string
-  appointmentType: 'CONSULTATION' | 'INSTALLATION' | 'MAINTENANCE' | 'REPAIR' | 'DELIVERY'
+  appointmentType: AppointmentType
   title: string
   description?: string
   scheduledDate: Date
@@ -151,8 +194,10 @@ export interface AppointmentCreateData {
   createdBy?: number
 }
 
+
+
 export interface AppointmentUpdateData {
-  appointmentType?: 'CONSULTATION' | 'INSTALLATION' | 'MAINTENANCE' | 'REPAIR' | 'DELIVERY'
+  appointmentType?: AppointmentType
   title?: string
   description?: string
   scheduledDate?: Date
@@ -167,14 +212,13 @@ export interface AppointmentUpdateData {
 }
 
 export interface AppointmentFilters {
-  status?: 'SCHEDULED' | 'CONFIRMED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'RESCHEDULED'
+  status?: AppointmentStatus
   assignedTo?: number
   dateFrom?: Date
   dateTo?: Date
-  appointmentType?: 'CONSULTATION' | 'INSTALLATION' | 'MAINTENANCE' | 'REPAIR' | 'DELIVERY'
+  appointmentType?: AppointmentType
 }
 
-export type AppointmentStatus = 'SCHEDULED' | 'CONFIRMED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'RESCHEDULED'
 
 export interface InvoiceCreateData {
   orderId?: number

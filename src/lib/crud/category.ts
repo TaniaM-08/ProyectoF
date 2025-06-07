@@ -1,9 +1,9 @@
-import prisma from '../prisma'
-import { CategoryCreateData, CategoryUpdateData } from '../types'
+import prisma from '../prisma';
+import { CategoryCreateData, CategoryUpdateData } from '../types';
 
 export const categoryCrud = {
   async create(data: CategoryCreateData) {
-    return await prisma.category.create({ data })
+    return await prisma.category.create({ data });
   },
 
   async getAll() {
@@ -12,8 +12,8 @@ export const categoryCrud = {
       include: {
         //
       },
-      orderBy: { name: 'asc' }
-    })
+      orderBy: { name: 'asc' },
+    });
   },
 
   async getById(id: number) {
@@ -22,17 +22,17 @@ export const categoryCrud = {
       include: {
         products: {
           where: { isActive: true },
-          take: 10
-        }
-      }
-    })
+          take: 10,
+        },
+      },
+    });
   },
 
   async getBySlug(slug: string) {
     return await prisma.category.findUnique({
       where: { slug },
-      include: { products: true }
-    })
+      include: { products: true },
+    });
   },
 
   async update(id: number, data: CategoryUpdateData) {
@@ -40,12 +40,12 @@ export const categoryCrud = {
       where: { id },
       data: {
         ...data,
-        updatedAt: new Date()
-      }
-    })
+        updatedAt: new Date(),
+      },
+    });
   },
 
   async delete(id: number) {
-    return await prisma.category.delete({ where: { id } })
-  }
-}
+    return await prisma.category.delete({ where: { id } });
+  },
+};

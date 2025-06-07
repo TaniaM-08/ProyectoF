@@ -2,8 +2,8 @@
   "compilerOptions": {
     "target": "ES2017",
     // "target": "ES2020",
-    // "module": "CommonJS",          // or "ESNext" if using "type": "module"
-    // "moduleResolution": "Node",
+    "module": "CommonJS",          // or "ESNext" if using "type": "module"
+    "moduleResolution": "Node",
     "outDir": "dist",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -11,8 +11,8 @@
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
+    // "module": "esnext",
+    // "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -26,6 +26,13 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "**/*",
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "src/lib/prisma.ts"
+  ],
   "exclude": ["node_modules"]
 }

@@ -1,5 +1,10 @@
-import prisma from '../prisma'
-import { QuoteCreateData, QuoteUpdateData, QuoteFilters, QuoteStatus } from '../types'
+import prisma from '../prisma';
+import {
+  QuoteCreateData,
+  QuoteUpdateData,
+  QuoteFilters,
+  QuoteStatus,
+} from '../types';
 
 export const quoteCrud = {
   async create(data: QuoteCreateData) {
@@ -7,20 +12,22 @@ export const quoteCrud = {
       data,
       include: {
         user: true,
-        creator: true
-      }
-    })
+        creator: true,
+      },
+    });
   },
 
   async getAll(filters?: QuoteFilters) {
-    const where: Record<string, unknown> = {}
-    
-    if (filters?.status) where.status = filters.status
-    if (filters?.userId) where.userId = filters.userId
+    const where: Record<string, unknown> = {};
+
+    if (filters?.status) where.status = filters.status;
+    if (filters?.userId) where.userId = filters.userId;
     if (filters?.dateFrom || filters?.dateTo) {
-      where.createdAt = {}
-      if (filters.dateFrom) (where.createdAt as Record<string, Date>).gte = filters.dateFrom
-      if (filters.dateTo) (where.createdAt as Record<string, Date>).lte = filters.dateTo
+      where.createdAt = {};
+      if (filters.dateFrom)
+        (where.createdAt as Record<string, Date>).gte = filters.dateFrom;
+      if (filters.dateTo)
+        (where.createdAt as Record<string, Date>).lte = filters.dateTo;
     }
 
     return await prisma.quote.findMany({
@@ -31,8 +38,8 @@ export const quoteCrud = {
         approver: true,
         //
       },
-      orderBy: { createdAt: 'desc' }
-    })
+      orderBy: { createdAt: 'desc' },
+    });
   },
 
   async getById(id: number) {
@@ -44,23 +51,26 @@ export const quoteCrud = {
         approver: true,
         orders: true,
         appointments: true,
-        invoices: true
-      }
-    })
+        invoices: true,
+      },
+    });
   },
 
   async updateStatus(id: number, status: QuoteStatus, approvedBy?: number) {
-    const updateData: Record<string, unknown> = { status, updatedAt: new Date() }
-    
+    const updateData: Record<string, unknown> = {
+      status,
+      updatedAt: new Date(),
+    };
+
     if (status === 'APPROVED' && approvedBy) {
-      updateData.approvedBy = approvedBy
-      updateData.approvedAt = new Date()
+      updateData.approvedBy = approvedBy;
+      updateData.approvedAt = new Date();
     }
 
     return await prisma.quote.update({
       where: { id },
-      data: updateData
-    })
+      data: updateData,
+    });
   },
 
   async update(id: number, data: QuoteUpdateData) {
@@ -68,12 +78,12 @@ export const quoteCrud = {
       where: { id },
       data: {
         ...data,
-        updatedAt: new Date()
-      }
-    })
+        updatedAt: new Date(),
+      },
+    });
   },
 
   async delete(id: number) {
-    return await prisma.quote.delete({ where: { id } })
-  }
-}
+    return await prisma.quote.delete({ where: { id } });
+  },
+};

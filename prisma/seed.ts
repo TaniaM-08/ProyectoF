@@ -1,4 +1,3 @@
-import { UserRole, QuoteStatus, OrderStatus, AppointmentType, AppointmentStatus } from '@/generated/prisma'
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
@@ -22,7 +21,7 @@ async function main() {
 
   console.log('Existing data cleaned...')
 
-  // Create Users
+  // Create passwords and users...
   const hashedPassword = await bcrypt.hash('123Isa', 10)
 
   const admin = await prisma.user.create({
@@ -32,7 +31,7 @@ async function main() {
       password: hashedPassword,
       phone: '+507 6210-4567',
       address: '123 Admin Street, David, Chiriquí',
-      role: UserRole.ADMIN,
+      role: 'ADMIN',
     },
   })
 
@@ -43,7 +42,7 @@ async function main() {
       password: hashedPassword,
       phone: '+507 6234-5678',
       address: '456 Employee Ave, David, Chiriquí',
-      role: UserRole.EMPLOYEE,
+      role: 'EMPLOYEE'
     },
   })
 
@@ -54,7 +53,7 @@ async function main() {
       password: hashedPassword,
       phone: '+507 6345-6789',
       address: '789 Worker Blvd, David, Chiriquí',
-      role: UserRole.EMPLOYEE,
+      role: 'EMPLOYEE'
     },
   })
 
@@ -65,7 +64,7 @@ async function main() {
       password: hashedPassword,
       phone: '+507 6456-7890',
       address: '321 Client Road, Boquete, Chiriquí',
-      role: UserRole.CLIENT,
+      role: 'CLIENT' 
     },
   })
 
@@ -76,7 +75,7 @@ async function main() {
       password: hashedPassword,
       phone: '+507 6567-8901',
       address: '654 Customer Lane, Dolega, Chiriquí',
-      role: UserRole.CLIENT,
+      role: 'CLIENT' 
     },
   })
 
@@ -87,7 +86,7 @@ async function main() {
       password: hashedPassword,
       phone: '+507 6678-9012',
       address: '987 Buyer Street, Puerto Armuelles, Chiriquí',
-      role: UserRole.CLIENT,
+      role: 'CLIENT' 
     },
   })
 
@@ -242,7 +241,7 @@ async function main() {
       clientEmail: 'anagarcia@gmail.com',
       clientPhone: '+507 6456-7890',
       clientAddress: '321 Client Road, Boquete, Chiriquí',
-      status: QuoteStatus.SENT,
+      status: 'SENT',
       subtotal: 750.00,
       discountAmount: 50.00,
       total: 700.00,
@@ -261,7 +260,7 @@ async function main() {
       clientEmail: 'robertosilvia@outlook.com',
       clientPhone: '+507 6567-8901',
       clientAddress: '654 Customer Lane, Dolega, Chiriquí',
-      status: QuoteStatus.APPROVED,
+      status: 'APPROVED',
       subtotal: 2500.00,
       discountAmount: 0.00,
       total: 2500.00,
@@ -282,7 +281,7 @@ async function main() {
       clientEmail: 'sofiamartinez@yahoo.com',
       clientPhone: '+507 6678-9012',
       clientAddress: '987 Buyer Street, Puerto Armuelles, Chiriquí',
-      status: QuoteStatus.DRAFT,
+      status: 'DRAFT',
       subtotal: 350.00,
       discountAmount: 0.00,
       total: 350.00,
@@ -302,7 +301,7 @@ async function main() {
       userId: client2.id,
       quoteId: quote2.id,
       orderNumber: 'ORD-2025-001',
-      status: OrderStatus.PROCESSING,
+      status: 'PROCESSING',
       subtotal: 2500.00,
       taxAmount: 175.00,
       shippingAmount: 100.00,
@@ -319,7 +318,7 @@ async function main() {
       userId: client1.id,
       quoteId: quote1.id,
       orderNumber: 'ORD-2025-002',
-      status: OrderStatus.SHIPPED,
+      status: 'SHIPPED',
       subtotal: 395.00,
       taxAmount: 27.65,
       shippingAmount: 25.00,
@@ -337,7 +336,7 @@ async function main() {
       userId: client3.id,
       quoteId: quote3.id,
       orderNumber: 'ORD-2025-003',
-      status: OrderStatus.SHIPPED,
+      status: 'SHIPPED',
       subtotal: 397.00,
       taxAmount: 29.65,
       shippingAmount: 27.00,
@@ -396,8 +395,8 @@ async function main() {
   const appointment1 = await prisma.appointment.create({
     data: {
       appointmentNumber: 'APP-2025-001',
-      appointmentType: AppointmentType.CONSULTATION,
-      status: AppointmentStatus.SCHEDULED,
+      appointmentType: 'CONSULTATION',
+      status: 'SCHEDULED',
       title: 'AC System Consultation',
       description: 'Initial consultation for central AC system installation',
       scheduledDate: new Date('2025-06-10'),
@@ -419,8 +418,8 @@ async function main() {
   const appointment2 = await prisma.appointment.create({
     data: {
       appointmentNumber: 'APP-2025-002',
-      appointmentType: AppointmentType.INSTALLATION,
-      status: AppointmentStatus.CONFIRMED,
+      appointmentType: 'INSTALLATION',
+      status: 'CONFIRMED',
       title: 'Central AC Installation',
       description: 'Installation of new central AC system',
       scheduledDate: new Date('2025-06-15'),
@@ -443,8 +442,8 @@ async function main() {
   const appointment3 = await prisma.appointment.create({
     data: {
       appointmentNumber: 'APP-2025-003',
-      appointmentType: AppointmentType.DELIVERY,
-      status: AppointmentStatus.COMPLETED,
+      appointmentType: 'DELIVERY',
+      status: 'COMPLETED',
       title: 'Window AC Delivery',
       description: 'Delivery of window AC unit and filters',
       scheduledDate: new Date('2025-06-05'),
@@ -520,28 +519,28 @@ async function main() {
     data: [
       {
         oldStatus: null,
-        newStatus: AppointmentStatus.SCHEDULED,
+        newStatus: 'SCHEDULED',
         appointmentId: appointment1.id,
         changedBy: admin.id,
         notes: 'Initial appointment scheduled',
       },
       {
-        oldStatus: AppointmentStatus.SCHEDULED,
-        newStatus: AppointmentStatus.CONFIRMED,
+        oldStatus: 'SCHEDULED',
+        newStatus: 'CONFIRMED',
         appointmentId: appointment2.id,
         changedBy: employee1.id,
         notes: 'Customer confirmed availability',
       },
       {
         oldStatus: null,
-        newStatus: AppointmentStatus.SCHEDULED,
+        newStatus: 'SCHEDULED',
         appointmentId: appointment3.id,
         changedBy: employee1.id,
         notes: 'Delivery scheduled',
       },
       {
-        oldStatus: AppointmentStatus.SCHEDULED,
-        newStatus: AppointmentStatus.COMPLETED,
+        oldStatus: 'SCHEDULED',
+        newStatus: 'COMPLETED',
         appointmentId: appointment3.id,
         changedBy: employee2.id,
         notes: 'Delivery completed successfully',
@@ -619,9 +618,9 @@ async function main() {
   console.log(`   Expenses: ${counts.expenses}`)
   
   console.log('\n🔐 Default login credentials:')
-  console.log('   Admin: isabel@company.com / 123Isa')
-  console.log('   Employee: maria@company.com / 123Isa')
-  console.log('   Client: ana@gmail.com / 123Isa')
+  console.log('   Admin: ialuo@tptc.com / 123Isa')
+  console.log('   Employee: mariarotriguez@tptc.com / 123Isa')
+  console.log('   Client: anagarcia@gmail.com / 123Isa')
 }
 
 main()
