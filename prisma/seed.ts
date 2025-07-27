@@ -489,7 +489,7 @@ async function main() {
   console.log('Cart items created...')
 
 
-  await prisma.invoice.createMany({
+await prisma.invoice.createMany({
     data: [
       {
         orderId: order1.id,
@@ -499,6 +499,7 @@ async function main() {
         taxAmount: 175.00,
         totalAmount: 2675.00,
         dueDate: new Date('2025-07-01'),
+        pdf_url: ""
       },
       {
         orderId: order2.id,
@@ -508,11 +509,41 @@ async function main() {
         totalAmount: 422.65,
         dueDate: new Date('2025-06-20'),
         paidAt: new Date('2025-06-06'),
+        pdf_url: ""
       },
     ],
   })
-
   console.log('Invoices created...')
+
+  // Mensajes de chat para estadísticas
+  await prisma.chatMessage.createMany({
+    data: [
+      // Productos buscados
+      { sender: 'user', text: 'Split AC Unit 12000 BTU', timestamp: new Date(), createdAt: new Date() },
+      { sender: 'user', text: 'Central AC System 24000 BTU', timestamp: new Date(), createdAt: new Date() },
+      { sender: 'user', text: 'Window AC Unit 8000 BTU', timestamp: new Date(), createdAt: new Date() },
+      { sender: 'user', text: 'Heat Pump System', timestamp: new Date(), createdAt: new Date() },
+      { sender: 'user', text: 'Air Filter Set (4-pack)', timestamp: new Date(), createdAt: new Date() },
+      { sender: 'user', text: 'Refrigerant R-410A', timestamp: new Date(), createdAt: new Date() },
+      { sender: 'user', text: 'Digital Manifold Gauge Set', timestamp: new Date(), createdAt: new Date() },
+      { sender: 'user', text: 'Vacuum Pump 4 CFM', timestamp: new Date(), createdAt: new Date() },
+      // Servicios
+      { sender: 'user', text: 'Quiero servicio Residencial', timestamp: new Date(), createdAt: new Date() },
+      { sender: 'user', text: 'Necesito servicio Comercial', timestamp: new Date(), createdAt: new Date() },
+      { sender: 'user', text: 'Servicio Marítimo', timestamp: new Date(), createdAt: new Date() },
+      { sender: 'user', text: 'Servicio Vehículos', timestamp: new Date(), createdAt: new Date() },
+      // Plagas
+      { sender: 'user', text: 'Tengo problema de Cucarachas', timestamp: new Date(), createdAt: new Date() },
+      { sender: 'user', text: 'Plaga de Roedores', timestamp: new Date(), createdAt: new Date() },
+      { sender: 'user', text: 'Hormigas en la cocina', timestamp: new Date(), createdAt: new Date() },
+      { sender: 'user', text: 'Mosquitos en el patio', timestamp: new Date(), createdAt: new Date() },
+      { sender: 'user', text: 'Pulgas y garrapatas en el perro', timestamp: new Date(), createdAt: new Date() },
+      { sender: 'user', text: 'Moscas en la casa', timestamp: new Date(), createdAt: new Date() },
+      { sender: 'user', text: 'Termitas en la madera', timestamp: new Date(), createdAt: new Date() },
+      { sender: 'user', text: 'Otra plaga desconocida', timestamp: new Date(), createdAt: new Date() },
+    ]
+  });
+  console.log('Chat messages for stats created...');
 
 
   await prisma.appointmentStatusHistory.createMany({
